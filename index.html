@@ -1,0 +1,1443 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>HOGWARTS CASE — открытие кейсов</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@400;700;900&family=Inter:wght@400;600;800;900&display=swap" rel="stylesheet">
+<style>
+* { margin: 0; padding: 0; box-sizing: border-box; }
+
+:root {
+    --bg-dark: #0a0a0f;
+    --bg-darker: #050508;
+    --bg-panel: #12121a;
+    --bg-elevated: #1a1a24;
+    --border: #25252f;
+    --border-light: #35353f;
+    --gold: #f5b800;
+    --gold-dark: #b8860b;
+    --text: #e8e8ee;
+    --text-dim: #8a8a95;
+    --text-muted: #5a5a65;
+    --blue: #4a7eff;
+    --purple: #9b4dff;
+    --pink: #ff4d94;
+    --red: #ff3b3b;
+    --orange: #ff8c1a;
+
+    --r-common: #7a7a85;
+    --r-uncommon: #4a7eff;
+    --r-rare: #9b4dff;
+    --r-epic: #ff4d94;
+    --r-legend: #f5b800;
+}
+
+html, body {
+    background: var(--bg-dark);
+    color: var(--text);
+    font-family: 'Inter', sans-serif;
+    min-height: 100vh;
+    overflow-x: hidden;
+}
+
+body::before {
+    content: '';
+    position: fixed;
+    inset: 0;
+    background:
+        radial-gradient(ellipse at 20% 0%, rgba(155, 77, 255, 0.08), transparent 50%),
+        radial-gradient(ellipse at 80% 100%, rgba(245, 184, 0, 0.06), transparent 50%);
+    pointer-events: none;
+    z-index: 0;
+}
+
+/* ============ ХЕДЕР ============ */
+.header {
+    position: sticky;
+    top: 0;
+    z-index: 100;
+    background: rgba(10, 10, 15, 0.85);
+    backdrop-filter: blur(20px);
+    -webkit-backdrop-filter: blur(20px);
+    border-bottom: 1px solid var(--border);
+}
+
+.header-inner {
+    max-width: 1400px;
+    margin: 0 auto;
+    padding: 16px 24px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 24px;
+}
+
+.logo {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    font-family: 'Cinzel', serif;
+    font-weight: 900;
+    font-size: 1.2rem;
+    letter-spacing: 2px;
+    text-transform: uppercase;
+    cursor: pointer;
+}
+
+.logo-mark {
+    width: 36px;
+    height: 36px;
+    border-radius: 8px;
+    background: linear-gradient(135deg, var(--gold), var(--gold-dark));
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-weight: 900;
+    color: #000;
+    font-size: 1rem;
+    box-shadow: 0 0 24px rgba(245, 184, 0, 0.4);
+}
+
+.logo-title {
+    background: linear-gradient(90deg, #fff 0%, var(--gold) 100%);
+    -webkit-background-clip: text;
+    background-clip: text;
+    -webkit-text-fill-color: transparent;
+}
+
+.header-stats {
+    display: flex;
+    gap: 24px;
+    font-size: 0.85rem;
+}
+
+.stat {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-end;
+    gap: 2px;
+}
+
+.stat-label {
+    color: var(--text-muted);
+    font-size: 0.7rem;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+}
+
+.stat-value {
+    color: var(--gold);
+    font-weight: 800;
+    font-size: 1rem;
+    font-variant-numeric: tabular-nums;
+}
+
+/* ============ ГЛАВНАЯ ============ */
+.main {
+    max-width: 1400px;
+    margin: 0 auto;
+    padding: 40px 24px 80px;
+    position: relative;
+    z-index: 1;
+}
+
+.page { display: none; }
+.page.active { display: block; animation: fadeIn 0.4s ease; }
+
+@keyframes fadeIn {
+    from { opacity: 0; transform: translateY(20px); }
+    to { opacity: 1; transform: translateY(0); }
+}
+
+.hero {
+    text-align: center;
+    margin-bottom: 60px;
+}
+
+.hero h1 {
+    font-family: 'Cinzel', serif;
+    font-size: clamp(2rem, 5vw, 3.4rem);
+    font-weight: 900;
+    letter-spacing: 4px;
+    text-transform: uppercase;
+    margin-bottom: 12px;
+    background: linear-gradient(135deg, #fff 0%, var(--gold) 60%, var(--gold-dark) 100%);
+    -webkit-background-clip: text;
+    background-clip: text;
+    -webkit-text-fill-color: transparent;
+}
+
+.hero p {
+    color: var(--text-dim);
+    font-size: 1.05rem;
+    max-width: 600px;
+    margin: 0 auto;
+    letter-spacing: 0.5px;
+}
+
+/* ============ СЕТКА КЕЙСОВ ============ */
+.cases-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+    gap: 24px;
+    margin-bottom: 40px;
+}
+
+.case-card {
+    position: relative;
+    background: linear-gradient(180deg, var(--bg-elevated) 0%, var(--bg-panel) 100%);
+    border: 1px solid var(--border);
+    border-radius: 16px;
+    padding: 24px 22px 22px;
+    cursor: pointer;
+    transition: transform 0.3s cubic-bezier(0.25, 0.8, 0.35, 1), border-color 0.3s ease, box-shadow 0.3s ease;
+    overflow: hidden;
+    user-select: none;
+}
+
+.case-card::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background: radial-gradient(circle at 50% 0%, rgba(245, 184, 0, 0.15), transparent 60%);
+    opacity: 0;
+    transition: opacity 0.4s ease;
+    pointer-events: none;
+}
+
+.case-card:hover {
+    transform: translateY(-6px);
+    border-color: var(--gold);
+    box-shadow: 0 20px 50px rgba(0, 0, 0, 0.6), 0 0 40px rgba(245, 184, 0, 0.25);
+}
+
+.case-card:hover::before { opacity: 1; }
+
+.case-card.special {
+    border-color: var(--red);
+    background: linear-gradient(180deg, #1f0a0a 0%, #150505 100%);
+}
+
+.case-card.special::before {
+    background: radial-gradient(circle at 50% 0%, rgba(255, 59, 59, 0.25), transparent 60%);
+}
+
+.case-card.special:hover {
+    border-color: var(--red);
+    box-shadow: 0 20px 50px rgba(0, 0, 0, 0.6), 0 0 50px rgba(255, 59, 59, 0.4);
+}
+
+.case-badge {
+    position: absolute;
+    top: 16px;
+    right: 16px;
+    padding: 4px 10px;
+    border-radius: 6px;
+    font-size: 0.7rem;
+    font-weight: 800;
+    letter-spacing: 1.5px;
+    text-transform: uppercase;
+}
+
+.case-badge.hot { background: var(--red); color: #fff; }
+.case-badge.new { background: var(--blue); color: #fff; }
+.case-badge.legend { background: var(--gold); color: #000; }
+
+.case-image {
+    height: 180px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin-bottom: 20px;
+    position: relative;
+}
+
+.case-image svg {
+    width: 140px;
+    height: 140px;
+    filter: drop-shadow(0 8px 24px rgba(0, 0, 0, 0.6));
+    transition: transform 0.5s cubic-bezier(0.25, 0.8, 0.35, 1);
+}
+
+.case-card:hover .case-image svg {
+    transform: scale(1.08) rotate(-2deg);
+}
+
+.case-name {
+    font-family: 'Cinzel', serif;
+    font-size: 1.15rem;
+    font-weight: 700;
+    letter-spacing: 1.5px;
+    text-transform: uppercase;
+    margin-bottom: 6px;
+    color: #fff;
+}
+
+.case-card.special .case-name {
+    color: #ff5a5a;
+    text-shadow: 0 0 20px rgba(255, 59, 59, 0.6);
+}
+
+.case-desc {
+    color: var(--text-dim);
+    font-size: 0.85rem;
+    margin-bottom: 16px;
+    line-height: 1.5;
+}
+
+.case-footer {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding-top: 16px;
+    border-top: 1px solid var(--border);
+}
+
+.case-price {
+    color: var(--gold);
+    font-weight: 800;
+    font-size: 1.1rem;
+    letter-spacing: 0.5px;
+}
+
+.case-price.free {
+    color: #4ade80;
+}
+
+.case-open-btn {
+    padding: 8px 16px;
+    background: var(--gold);
+    color: #000;
+    border: none;
+    border-radius: 8px;
+    font-family: inherit;
+    font-weight: 800;
+    font-size: 0.8rem;
+    letter-spacing: 1px;
+    text-transform: uppercase;
+    cursor: pointer;
+    transition: all 0.25s ease;
+}
+
+.case-open-btn:hover {
+    background: #fff;
+    transform: scale(1.05);
+}
+
+.case-card.special .case-open-btn {
+    background: var(--red);
+    color: #fff;
+}
+
+.case-card.special .case-open-btn:hover {
+    background: #ff5a5a;
+    box-shadow: 0 0 25px rgba(255, 59, 59, 0.8);
+}
+
+/* ============ СТРАНИЦА ОТКРЫТИЯ ============ */
+.opener {
+    max-width: 1200px;
+    margin: 0 auto;
+}
+
+.back-btn {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    padding: 10px 18px;
+    background: var(--bg-elevated);
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    color: var(--text);
+    font-family: inherit;
+    font-size: 0.9rem;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.25s ease;
+    margin-bottom: 32px;
+}
+
+.back-btn:hover {
+    border-color: var(--gold);
+    color: var(--gold);
+    transform: translateX(-3px);
+}
+
+.opener-header {
+    text-align: center;
+    margin-bottom: 40px;
+}
+
+.opener-title {
+    font-family: 'Cinzel', serif;
+    font-size: clamp(1.6rem, 4vw, 2.4rem);
+    font-weight: 900;
+    letter-spacing: 3px;
+    text-transform: uppercase;
+    margin-bottom: 8px;
+    color: #fff;
+}
+
+.opener-subtitle {
+    color: var(--text-dim);
+    font-size: 0.95rem;
+    letter-spacing: 0.5px;
+}
+
+/* ============ РУЛЕТКА ============ */
+.roulette-container {
+    position: relative;
+    background: linear-gradient(180deg, var(--bg-darker) 0%, var(--bg-panel) 100%);
+    border: 1px solid var(--border);
+    border-radius: 16px;
+    padding: 40px 0;
+    margin-bottom: 40px;
+    overflow: hidden;
+    height: 240px;
+}
+
+.roulette-container::before,
+.roulette-container::after {
+    content: '';
+    position: absolute;
+    top: 0;
+    bottom: 0;
+    width: 200px;
+    z-index: 5;
+    pointer-events: none;
+}
+
+.roulette-container::before {
+    left: 0;
+    background: linear-gradient(90deg, var(--bg-darker) 0%, transparent 100%);
+}
+
+.roulette-container::after {
+    right: 0;
+    background: linear-gradient(-90deg, var(--bg-darker) 0%, transparent 100%);
+}
+
+.roulette-marker {
+    position: absolute;
+    left: 50%;
+    top: 0;
+    bottom: 0;
+    width: 2px;
+    background: linear-gradient(180deg, transparent, var(--gold), var(--gold), transparent);
+    z-index: 10;
+    transform: translateX(-50%);
+    box-shadow: 0 0 20px var(--gold);
+    pointer-events: none;
+}
+
+.roulette-marker::before,
+.roulette-marker::after {
+    content: '';
+    position: absolute;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 0;
+    height: 0;
+    border-style: solid;
+}
+
+.roulette-marker::before {
+    top: 0;
+    border-width: 12px 10px 0 10px;
+    border-color: var(--gold) transparent transparent transparent;
+}
+
+.roulette-marker::after {
+    bottom: 0;
+    border-width: 0 10px 12px 10px;
+    border-color: transparent transparent var(--gold) transparent;
+}
+
+.roulette-track {
+    display: flex;
+    gap: 12px;
+    padding: 20px 0;
+    transition: transform 6s cubic-bezier(0.15, 0.9, 0.15, 1);
+    will-change: transform;
+}
+
+.roulette-item {
+    flex-shrink: 0;
+    width: 160px;
+    height: 160px;
+    background: linear-gradient(180deg, var(--bg-elevated) 0%, var(--bg-panel) 100%);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    padding: 12px;
+    position: relative;
+    overflow: hidden;
+}
+
+.roulette-item::after {
+    content: '';
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    height: 3px;
+}
+
+.roulette-item[data-r="common"]::after { background: var(--r-common); }
+.roulette-item[data-r="uncommon"]::after { background: var(--r-uncommon); }
+.roulette-item[data-r="rare"]::after { background: var(--r-rare); }
+.roulette-item[data-r="epic"]::after { background: var(--r-epic); }
+.roulette-item[data-r="legend"]::after { background: var(--r-legend); }
+
+.roulette-item[data-r="uncommon"] { border-color: rgba(74, 126, 255, 0.4); }
+.roulette-item[data-r="rare"] { border-color: rgba(155, 77, 255, 0.4); }
+.roulette-item[data-r="epic"] { border-color: rgba(255, 77, 148, 0.4); }
+.roulette-item[data-r="legend"] {
+    border-color: rgba(245, 184, 0, 0.5);
+    box-shadow: inset 0 0 30px rgba(245, 184, 0, 0.15);
+}
+
+.roulette-item-icon {
+    width: 72px;
+    height: 72px;
+    margin-bottom: 10px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.roulette-item-icon svg {
+    width: 100%;
+    height: 100%;
+    filter: drop-shadow(0 4px 12px rgba(0, 0, 0, 0.5));
+}
+
+.roulette-item-name {
+    font-size: 0.72rem;
+    font-weight: 700;
+    text-align: center;
+    line-height: 1.2;
+    color: var(--text);
+    letter-spacing: 0.3px;
+}
+
+/* ============ РЕЗУЛЬТАТ ============ */
+.result-overlay {
+    position: fixed;
+    inset: 0;
+    background: rgba(0, 0, 0, 0.92);
+    z-index: 500;
+    display: none;
+    align-items: center;
+    justify-content: center;
+    padding: 20px;
+    animation: overlayIn 0.4s ease;
+}
+
+.result-overlay.show {
+    display: flex;
+}
+
+@keyframes overlayIn {
+    from { opacity: 0; }
+    to { opacity: 1; }
+}
+
+.result-card {
+    position: relative;
+    background: linear-gradient(180deg, var(--bg-elevated) 0%, var(--bg-panel) 100%);
+    border-radius: 24px;
+    padding: 48px 40px 40px;
+    max-width: 480px;
+    width: 100%;
+    text-align: center;
+    border: 2px solid var(--border-light);
+    animation: resultZoom 0.6s cubic-bezier(0.25, 0.8, 0.35, 1);
+    overflow: hidden;
+}
+
+@keyframes resultZoom {
+    from { transform: scale(0.6); opacity: 0; }
+    to { transform: scale(1); opacity: 1; }
+}
+
+.result-card[data-r="common"] { border-color: var(--r-common); }
+.result-card[data-r="uncommon"] { border-color: var(--r-uncommon); box-shadow: 0 0 60px rgba(74, 126, 255, 0.4); }
+.result-card[data-r="rare"] { border-color: var(--r-rare); box-shadow: 0 0 80px rgba(155, 77, 255, 0.5); }
+.result-card[data-r="epic"] { border-color: var(--r-epic); box-shadow: 0 0 100px rgba(255, 77, 148, 0.5); }
+.result-card[data-r="legend"] {
+    border-color: var(--r-legend);
+    box-shadow: 0 0 120px rgba(245, 184, 0, 0.6);
+    background: linear-gradient(180deg, #1f1808 0%, #15100a 100%);
+}
+
+.result-glow {
+    position: absolute;
+    inset: -50%;
+    background: radial-gradient(circle, currentColor, transparent 60%);
+    opacity: 0.15;
+    pointer-events: none;
+    animation: resultGlow 3s ease-in-out infinite;
+}
+
+@keyframes resultGlow {
+    0%, 100% { transform: scale(1); opacity: 0.15; }
+    50% { transform: scale(1.3); opacity: 0.3; }
+}
+
+.result-rarity {
+    display: inline-block;
+    padding: 6px 16px;
+    border-radius: 20px;
+    font-size: 0.75rem;
+    font-weight: 900;
+    letter-spacing: 2px;
+    text-transform: uppercase;
+    margin-bottom: 24px;
+    position: relative;
+    z-index: 1;
+}
+
+.result-rarity[data-r="common"] { background: var(--r-common); color: #fff; }
+.result-rarity[data-r="uncommon"] { background: var(--r-uncommon); color: #fff; }
+.result-rarity[data-r="rare"] { background: var(--r-rare); color: #fff; }
+.result-rarity[data-r="epic"] { background: var(--r-epic); color: #fff; }
+.result-rarity[data-r="legend"] { background: var(--r-legend); color: #000; }
+
+.result-icon {
+    width: 140px;
+    height: 140px;
+    margin: 0 auto 24px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    position: relative;
+    z-index: 1;
+    animation: resultIconFloat 3s ease-in-out infinite;
+}
+
+@keyframes resultIconFloat {
+    0%, 100% { transform: translateY(0); }
+    50% { transform: translateY(-10px); }
+}
+
+.result-icon svg {
+    width: 100%;
+    height: 100%;
+    filter: drop-shadow(0 10px 30px rgba(0, 0, 0, 0.6));
+}
+
+.result-name {
+    font-family: 'Cinzel', serif;
+    font-size: 1.6rem;
+    font-weight: 900;
+    letter-spacing: 2px;
+    margin-bottom: 10px;
+    color: #fff;
+    position: relative;
+    z-index: 1;
+}
+
+.result-desc {
+    color: var(--text-dim);
+    font-size: 0.9rem;
+    line-height: 1.6;
+    margin-bottom: 32px;
+    position: relative;
+    z-index: 1;
+}
+
+.result-actions {
+    display: flex;
+    gap: 12px;
+    justify-content: center;
+    position: relative;
+    z-index: 1;
+    flex-wrap: wrap;
+}
+
+.result-btn {
+    padding: 12px 24px;
+    border-radius: 10px;
+    border: none;
+    font-family: inherit;
+    font-weight: 800;
+    font-size: 0.85rem;
+    letter-spacing: 1px;
+    text-transform: uppercase;
+    cursor: pointer;
+    transition: all 0.25s ease;
+}
+
+.result-btn.primary {
+    background: var(--gold);
+    color: #000;
+}
+
+.result-btn.primary:hover {
+    background: #fff;
+    transform: scale(1.05);
+}
+
+.result-btn.secondary {
+    background: transparent;
+    color: var(--text);
+    border: 1px solid var(--border-light);
+}
+
+.result-btn.secondary:hover {
+    border-color: var(--gold);
+    color: var(--gold);
+}
+
+/* ============ СМЕХ ============ */
+.laugh-overlay {
+    position: fixed;
+    inset: 0;
+    z-index: 400;
+    display: none;
+    align-items: center;
+    justify-content: center;
+    pointer-events: none;
+}
+
+.laugh-overlay.show {
+    display: flex;
+}
+
+.laugh-text {
+    font-family: 'Cinzel', serif;
+    font-size: clamp(4rem, 15vw, 14rem);
+    font-weight: 900;
+    letter-spacing: 8px;
+    color: var(--red);
+    text-shadow:
+        0 0 40px rgba(255, 59, 59, 0.9),
+        0 0 80px rgba(255, 59, 59, 0.6),
+        0 0 120px rgba(255, 59, 59, 0.4);
+    animation: laughAnim 0.15s ease-in-out infinite;
+    user-select: none;
+}
+
+@keyframes laughAnim {
+    0%, 100% { transform: rotate(-3deg) scale(1); }
+    50% { transform: rotate(3deg) scale(1.08); }
+}
+
+/* ============ ИСТОРИЯ ============ */
+.history {
+    margin-top: 40px;
+    background: var(--bg-panel);
+    border: 1px solid var(--border);
+    border-radius: 16px;
+    padding: 24px;
+}
+
+.history-title {
+    font-family: 'Cinzel', serif;
+    font-size: 1rem;
+    font-weight: 700;
+    letter-spacing: 2px;
+    text-transform: uppercase;
+    color: var(--gold);
+    margin-bottom: 16px;
+}
+
+.history-list {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    max-height: 300px;
+    overflow-y: auto;
+}
+
+.history-item {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding: 10px 14px;
+    background: var(--bg-elevated);
+    border-radius: 10px;
+    border-left: 3px solid var(--border);
+    font-size: 0.85rem;
+}
+
+.history-item[data-r="common"] { border-left-color: var(--r-common); }
+.history-item[data-r="uncommon"] { border-left-color: var(--r-uncommon); }
+.history-item[data-r="rare"] { border-left-color: var(--r-rare); }
+.history-item[data-r="epic"] { border-left-color: var(--r-epic); }
+.history-item[data-r="legend"] { border-left-color: var(--r-legend); }
+
+.history-empty {
+    color: var(--text-muted);
+    font-style: italic;
+    font-size: 0.85rem;
+    padding: 12px 0;
+}
+
+.history-item-name {
+    flex: 1;
+    font-weight: 600;
+    color: var(--text);
+}
+
+.history-item-rarity {
+    font-size: 0.7rem;
+    font-weight: 800;
+    letter-spacing: 1px;
+    text-transform: uppercase;
+    padding: 3px 8px;
+    border-radius: 4px;
+}
+
+.history-item-rarity[data-r="common"] { background: var(--r-common); color: #fff; }
+.history-item-rarity[data-r="uncommon"] { background: var(--r-uncommon); color: #fff; }
+.history-item-rarity[data-r="rare"] { background: var(--r-rare); color: #fff; }
+.history-item-rarity[data-r="epic"] { background: var(--r-epic); color: #fff; }
+.history-item-rarity[data-r="legend"] { background: var(--r-legend); color: #000; }
+
+/* ============ ФУТЕР ============ */
+.footer {
+    text-align: center;
+    padding: 32px 24px;
+    color: var(--text-muted);
+    font-size: 0.8rem;
+    border-top: 1px solid var(--border);
+    margin-top: 60px;
+}
+
+/* ============ МОБИЛЬНЫЙ ============ */
+@media (max-width: 640px) {
+    .header-stats { display: none; }
+    .hero { margin-bottom: 40px; }
+    .cases-grid { grid-template-columns: 1fr; gap: 16px; }
+    .case-image { height: 140px; }
+    .case-image svg { width: 110px; height: 110px; }
+    .roulette-container { height: 200px; }
+    .roulette-item { width: 130px; height: 130px; }
+    .roulette-item-icon { width: 60px; height: 60px; }
+    .roulette-item-name { font-size: 0.65rem; }
+    .result-card { padding: 32px 24px 28px; }
+    .result-icon { width: 110px; height: 110px; }
+    .result-name { font-size: 1.3rem; }
+    .roulette-container::before,
+    .roulette-container::after { width: 80px; }
+}
+</style>
+</head>
+<body>
+
+<header class="header">
+    <div class="header-inner">
+        <div class="logo" onclick="goHome()">
+            <div class="logo-mark">HP</div>
+            <div class="logo-title">Hogwarts Case</div>
+        </div>
+        <div class="header-stats">
+            <div class="stat">
+                <span class="stat-label">Открыто кейсов</span>
+                <span class="stat-value" id="statOpened">0</span>
+            </div>
+            <div class="stat">
+                <span class="stat-label">Легендарных</span>
+                <span class="stat-value" id="statLegend">0</span>
+            </div>
+            <div class="stat">
+                <span class="stat-label">Баланс</span>
+                <span class="stat-value" id="statBalance">10 000</span>
+            </div>
+        </div>
+    </div>
+</header>
+
+<main class="main">
+
+    <!-- ГЛАВНАЯ -->
+    <section id="pageHome" class="page active">
+        <div class="hero">
+            <h1>Открывай кейсы Хогвартса</h1>
+            <p>Испытай удачу и собери коллекцию редчайших артефактов магического мира</p>
+        </div>
+        <div class="cases-grid" id="casesGrid"></div>
+
+        <div class="history">
+            <div class="history-title">Последние выпадения</div>
+            <div class="history-list" id="historyList">
+                <div class="history-empty">Вы ещё не открывали кейсы</div>
+            </div>
+        </div>
+    </section>
+
+    <!-- ОТКРЫТИЕ -->
+    <section id="pageOpener" class="page">
+        <div class="opener">
+            <button class="back-btn" onclick="goHome()">← Назад к кейсам</button>
+
+            <div class="opener-header">
+                <div class="opener-title" id="openerTitle">Кейс</div>
+                <div class="opener-subtitle" id="openerSubtitle">Испытай удачу</div>
+            </div>
+
+            <div class="roulette-container">
+                <div class="roulette-marker"></div>
+                <div class="roulette-track" id="rouletteTrack"></div>
+            </div>
+        </div>
+    </section>
+
+</main>
+
+<footer class="footer">
+    <p>HOGWARTS CASE — учебный проект. Все права на мир Гарри Поттера принадлежат Дж. К. Роулинг.</p>
+</footer>
+
+<!-- РЕЗУЛЬТАТ -->
+<div class="result-overlay" id="resultOverlay">
+    <div class="result-card" id="resultCard">
+        <div class="result-glow" id="resultGlow"></div>
+        <div class="result-rarity" id="resultRarity">Редкий</div>
+        <div class="result-icon" id="resultIcon"></div>
+        <div class="result-name" id="resultName">Название</div>
+        <div class="result-desc" id="resultDesc">Описание</div>
+        <div class="result-actions">
+            <button class="result-btn primary" id="resultAgain">Открыть ещё</button>
+            <button class="result-btn secondary" onclick="closeResult()">Закрыть</button>
+        </div>
+    </div>
+</div>
+
+<!-- СМЕХ -->
+<div class="laugh-overlay" id="laughOverlay">
+    <div class="laugh-text">АХАХАХАХА</div>
+</div>
+
+<script>
+"use strict";
+
+/* ============================================================
+   ДАННЫЕ ПРЕДМЕТОВ
+   ============================================================ */
+
+var RARITY_NAMES = {
+    common: "Обычный",
+    uncommon: "Необычный",
+    rare: "Редкий",
+    epic: "Эпический",
+    legend: "Легендарный"
+};
+
+/* SVG-иконки предметов */
+function svgWand(c) { c = c || '#b8860b'; return '<svg viewBox="0 0 100 100"><path d="M15 85 L80 20 Q84 16 88 20 Q92 24 88 28 L23 93 Q19 97 15 93 Q11 89 15 85 Z" fill="' + c + '" stroke="#3a2a0a" stroke-width="1.5"/><circle cx="84" cy="24" r="6" fill="' + c + '" opacity="0.7"/></svg>'; }
+function svgBook(c) { c = c || '#8b1a1a'; return '<svg viewBox="0 0 100 100"><rect x="20" y="15" width="60" height="70" rx="3" fill="' + c + '" stroke="#2a0505" stroke-width="2"/><rect x="20" y="15" width="8" height="70" fill="#2a0505" opacity="0.5"/><circle cx="55" cy="50" r="12" fill="none" stroke="#f5b800" stroke-width="2"/><circle cx="55" cy="50" r="5" fill="#f5b800"/></svg>'; }
+function svgPotion(c) { c = c || '#4a7eff'; return '<svg viewBox="0 0 100 100"><path d="M42 15 L42 35 Q20 45 20 65 Q20 88 50 88 Q80 88 80 65 Q80 45 58 35 L58 15 Z" fill="' + c + '" stroke="#1a2a55" stroke-width="2"/><rect x="38" y="10" width="24" height="8" rx="2" fill="#555"/><circle cx="40" cy="60" r="4" fill="#fff" opacity="0.4"/><circle cx="60" cy="70" r="3" fill="#fff" opacity="0.3"/></svg>'; }
+function svgHat(c) { c = c || '#4a3520'; return '<svg viewBox="0 0 100 100"><path d="M50 15 Q35 40 25 65 Q20 85 50 92 Q80 85 75 65 Q65 40 50 15 Z" fill="' + c + '" stroke="#1a0f06" stroke-width="2"/><path d="M30 70 Q50 60 70 70" stroke="#b8860b" stroke-width="2" fill="none"/><circle cx="42" cy="60" r="3" fill="#f5b800"/><circle cx="58" cy="60" r="3" fill="#f5b800"/></svg>'; }
+function svgStone(c) { c = c || '#dc2626'; return '<svg viewBox="0 0 100 100"><path d="M50 15 Q82 40 82 62 Q82 85 50 95 Q18 85 18 62 Q18 40 50 15 Z" fill="' + c + '" stroke="#450a0a" stroke-width="2"/><path d="M50 30 Q68 48 68 62 Q68 78 50 85 Q32 78 32 62 Q32 48 50 30 Z" fill="#fde68a" opacity="0.6"/></svg>'; }
+function svgSword(c) { c = c || '#cbd5e1'; return '<svg viewBox="0 0 100 100"><path d="M50 10 L56 30 L56 78 L50 90 L44 78 L44 30 Z" fill="' + c + '" stroke="#475569" stroke-width="1.5"/><rect x="36" y="78" width="28" height="6" rx="1" fill="#b8860b"/><rect x="45" y="84" width="10" height="12" rx="2" fill="#3a2a1a"/></svg>'; }
+function svgMap(c) { c = c || '#d6c08a'; return '<svg viewBox="0 0 100 100"><rect x="15" y="12" width="70" height="80" rx="3" fill="' + c + '" stroke="#4a3520" stroke-width="2"/><path d="M15 30 L85 30 M15 50 L85 50 M15 70 L85 70" stroke="#4a3520" stroke-width="1" opacity="0.5"/><path d="M25 40 Q50 35 75 45" stroke="#7f1d1d" stroke-width="1.5" fill="none"/><circle cx="50" cy="75" r="3" fill="#b8860b"/></svg>'; }
+function svgPouch(c) { c = c || '#8b6914'; return '<svg viewBox="0 0 100 100"><ellipse cx="50" cy="62" rx="30" ry="25" fill="' + c + '" stroke="#3a2508" stroke-width="2"/><path d="M35 40 Q50 32 65 40 L60 42 Q50 38 40 42 Z" fill="#3a2508"/><text x="50" y="68" font-family="Cinzel" font-size="22" font-weight="900" text-anchor="middle" fill="#f5b800">₽</text></svg>'; }
+function svgCrown(c) { c = c || '#f5b800'; return '<svg viewBox="0 0 100 100"><path d="M20 70 L25 30 L40 50 L50 25 L60 50 L75 30 L80 70 Z" fill="' + c + '" stroke="#7a5800" stroke-width="2"/><rect x="20" y="70" width="60" height="10" rx="2" fill="' + c + '" stroke="#7a5800" stroke-width="2"/><circle cx="35" cy="65" r="3" fill="#ff3b3b"/><circle cx="50" cy="65" r="3" fill="#4a7eff"/><circle cx="65" cy="65" r="3" fill="#4ade80"/></svg>'; }
+function svgPhoenix(c) { c = c || '#ff4d1a'; return '<svg viewBox="0 0 100 100"><ellipse cx="50" cy="55" rx="14" ry="22" fill="' + c + '"/><path d="M36 50 Q20 35 12 45 Q22 52 36 55 Z" fill="' + c + '" opacity="0.7"/><path d="M64 50 Q80 35 88 45 Q78 52 64 55 Z" fill="' + c + '" opacity="0.7"/><circle cx="46" cy="42" r="2" fill="#000"/><circle cx="54" cy="42" r="2" fill="#000"/><path d="M50 45 L48 50 L52 50 Z" fill="#f5b800"/><path d="M30 75 Q50 85 70 75" stroke="#f5b800" stroke-width="3" fill="none"/></svg>'; }
+function svgDragon(c) { c = c || '#2a4a2a'; return '<svg viewBox="0 0 100 100"><path d="M50 20 Q70 30 75 55 Q80 80 60 85 Q40 85 30 70 Q20 55 35 35 Q42 25 50 20 Z" fill="' + c + '" stroke="#0a1a0a" stroke-width="2"/><circle cx="45" cy="45" r="3" fill="#ff3b3b"/><path d="M60 30 L70 20 L68 35 Z" fill="' + c + '"/><path d="M30 60 Q25 70 20 72" stroke="#ff8c1a" stroke-width="3" fill="none"/></svg>'; }
+function svgCloak(c) { c = c || '#1a1a2a'; return '<svg viewBox="0 0 100 100"><path d="M50 15 Q30 25 25 50 Q20 80 30 90 L70 90 Q80 80 75 50 Q70 25 50 15 Z" fill="' + c + '" stroke="#000" stroke-width="2" opacity="0.85"/><path d="M40 40 Q50 35 60 40" stroke="#5a5a7a" stroke-width="1.5" fill="none"/></svg>'; }
+function svgSnitchSmall(c) { c = c || '#f5b800'; return '<svg viewBox="0 0 100 100"><ellipse cx="50" cy="50" rx="14" ry="10" fill="' + c + '" stroke="#7a5800" stroke-width="1.5"/><circle cx="50" cy="50" r="4" fill="#fff" opacity="0.7"/><path d="M36 50 Q20 38 10 45 Q20 52 36 50 Z" fill="' + c + '" opacity="0.7"/><path d="M64 50 Q80 38 90 45 Q80 52 64 50 Z" fill="' + c + '" opacity="0.7"/></svg>'; }
+function svgRing(c) { c = c || '#b8860b'; return '<svg viewBox="0 0 100 100"><circle cx="50" cy="55" r="28" fill="none" stroke="' + c + '" stroke-width="6"/><path d="M42 27 L50 12 L58 27 Z" fill="#ff3b3b" stroke="#7a0000" stroke-width="1.5"/></svg>'; }
+function svgEye(c) { c = c || '#f5b800'; return '<svg viewBox="0 0 100 100"><ellipse cx="50" cy="50" rx="38" ry="22" fill="' + c + '" opacity="0.9"/><ellipse cx="50" cy="50" rx="38" ry="22" fill="none" stroke="#7a5800" stroke-width="2"/><circle cx="50" cy="50" r="12" fill="#0a0a0f"/><circle cx="50" cy="50" r="4" fill="#ff3b3b"/></svg>'; }
+function svgLaughIcon() { return '<svg viewBox="0 0 100 100"><circle cx="50" cy="50" r="38" fill="#f5b800" stroke="#7a5800" stroke-width="3"/><circle cx="37" cy="42" r="5" fill="#000"/><circle cx="63" cy="42" r="5" fill="#000"/><path d="M30 60 Q50 85 70 60 Q50 72 30 60 Z" fill="#000"/><path d="M25 30 Q35 22 40 28" stroke="#7a5800" stroke-width="2" fill="none"/><path d="M75 30 Q65 22 60 28" stroke="#7a5800" stroke-width="2" fill="none"/></svg>'; }
+
+/* ============================================================
+   КЕЙСЫ
+   ============================================================ */
+
+var CASES = [
+    {
+        id: "hogwarts",
+        name: "Кейс Хогвартса",
+        desc: "Базовый набор — артефакты школы",
+        price: 500,
+        badge: null,
+        iconSvg: svgCrown(),
+        items: [
+            { name: "Волшебная палочка", rarity: "common", icon: svgWand('#7a7a85'), desc: "Простая палочка из ясеня" },
+            { name: "Учебник зелий", rarity: "common", icon: svgBook('#7a7a85'), desc: "Потрёпанный учебник за 3 курс" },
+            { name: "Зелье удачи", rarity: "uncommon", icon: svgPotion('#4a7eff'), desc: "Феликс Фелицис, малая доза" },
+            { name: "Распределяющая шляпа", rarity: "rare", icon: svgHat('#9b4dff'), desc: "Спорит и поёт" },
+            { name: "Карта Мародёров", rarity: "epic", icon: svgMap('#ff4d94'), desc: "Торжественно клянусь..." },
+            { name: "Мантия-невидимка", rarity: "legend", icon: svgCloak('#f5b800'), desc: "Дар Смерти" }
+        ]
+    },
+    {
+        id: "artifacts",
+        name: "Артефакты Смерти",
+        desc: "Древние предметы величайшей силы",
+        price: 1500,
+        badge: "new",
+        iconSvg: svgRing(),
+        items: [
+            { name: "Волшебная палочка", rarity: "common", icon: svgWand('#7a7a85'), desc: "Обычная палочка" },
+            { name: "Философский камень", rarity: "uncommon", icon: svgStone('#4a7eff'), desc: "Дарует бессмертие" },
+            { name: "Меч Гриффиндора", rarity: "rare", icon: svgSword('#9b4dff'), desc: "Впитывает яд василиска" },
+            { name: "Бузинная палочка", rarity: "epic", icon: svgWand('#ff4d94'), desc: "Сильнейшая в мире" },
+            { name: "Воскрешающий камень", rarity: "legend", icon: svgRing('#f5b800'), desc: "Возвращает призраков" },
+            { name: "Мантия-невидимка", rarity: "legend", icon: svgCloak('#f5b800'), desc: "Дар Смерти" }
+        ]
+    },
+    {
+        id: "creatures",
+        name: "Магические существа",
+        desc: "Драконы, фениксы и прочая живность",
+        price: 2500,
+        badge: null,
+        iconSvg: svgDragon(),
+        items: [
+            { name: "Сова-почтальон", rarity: "common", icon: svgSnitchSmall('#7a7a85'), desc: "Доставляет письма" },
+            { name: "Зелье для драконов", rarity: "common", icon: svgPotion('#7a7a85'), desc: "Стандартный набор" },
+            { name: "Гиппогриф", rarity: "uncommon", icon: svgPhoenix('#4a7eff'), desc: "Полу-конь полу-птица" },
+            { name: "Феникс", rarity: "rare", icon: svgPhoenix('#9b4dff'), desc: "Возрождается из пепла" },
+            { name: "Венгерская Хвосторога", rarity: "epic", icon: svgDragon('#ff4d94'), desc: "Опасна, уровень XXXXX" },
+            { name: "Василиск", rarity: "legend", icon: svgEye('#f5b800'), desc: "Король змей" }
+        ]
+    },
+    {
+        id: "egor",
+        name: "ЕГОР СЛИЛ БАБКИ",
+        desc: "Особый кейс. Только для смелых.",
+        price: 0,
+        badge: "hot",
+        special: true,
+        iconSvg: svgPouch(),
+        items: [
+            { name: "Пустой кошелёк", rarity: "common", icon: svgPouch('#7a7a85'), desc: "Бывает" },
+            { name: "Кредит в банке", rarity: "common", icon: svgPouch('#7a7a85'), desc: "Минус 100 000" },
+            { name: "Долг другу", rarity: "uncommon", icon: svgPouch('#4a7eff'), desc: "Верни до пятницы" },
+            { name: "Закладка в ломбарде", rarity: "rare", icon: svgRing('#9b4dff'), desc: "Палочка в залоге" },
+            { name: "Чужая куртка", rarity: "epic", icon: svgCloak('#ff4d94'), desc: "Забрал у Смирнова" },
+            { name: "СЛИЛ ВСЁ", rarity: "legend", icon: svgLaughIcon(), desc: "Егор слил бабки. АХАХАХА" }
+        ]
+    },
+    {
+        id: "voldemort",
+        name: "Наследие Волан-де-Морта",
+        desc: "Тёмные артефакты и крестражи",
+        price: 5000,
+        badge: "legend",
+        iconSvg: svgEye(),
+        items: [
+            { name: "Дневник Реддла", rarity: "common", icon: svgBook('#7a7a85'), desc: "Пустой, но не совсем" },
+            { name: "Кольцо Гонтов", rarity: "uncommon", icon: svgRing('#4a7eff'), desc: "С проклятием" },
+            { name: "Медальон Слизерина", rarity: "rare", icon: svgRing('#9b4dff'), desc: "Открывается на парселтанге" },
+            { name: "Чаша Хаффлпафф", rarity: "epic", icon: svgStone('#ff4d94'), desc: "Крестраж" },
+            { name: "Диадема Когтевран", rarity: "epic", icon: svgCrown('#ff4d94'), desc: "Потеряна в Выручай-комнате" },
+            { name: "Нагайна", rarity: "legend", icon: svgEye('#f5b800'), desc: "Последний крестраж" }
+        ]
+    }
+];
+
+/* ============================================================
+   СОСТОЯНИЕ
+   ============================================================ */
+
+var state = {
+    balance: 10000,
+    opened: 0,
+    legendary: 0,
+    history: [],
+    currentCase: null,
+    spinning: false
+};
+
+/* ============================================================
+   ЗВУК
+   ============================================================ */
+
+var audioCtx = null;
+
+function getAudio() {
+    if (!audioCtx) {
+        try {
+            var Ctx = window.AudioContext || window.webkitAudioContext;
+            if (!Ctx) return null;
+            audioCtx = new Ctx();
+        } catch (e) { return null; }
+    }
+    if (audioCtx.state === 'suspended') audioCtx.resume();
+    return audioCtx;
+}
+
+function playClick() {
+    var ctx = getAudio();
+    if (!ctx) return;
+    var o = ctx.createOscillator();
+    var g = ctx.createGain();
+    o.type = 'square';
+    o.frequency.setValueAtTime(800, ctx.currentTime);
+    o.frequency.exponentialRampToValueAtTime(400, ctx.currentTime + 0.08);
+    g.gain.setValueAtTime(0.0001, ctx.currentTime);
+    g.gain.exponentialRampToValueAtTime(0.06, ctx.currentTime + 0.01);
+    g.gain.exponentialRampToValueAtTime(0.0001, ctx.currentTime + 0.12);
+    o.connect(g);
+    g.connect(ctx.destination);
+    o.start();
+    o.stop(ctx.currentTime + 0.15);
+}
+
+function playTick() {
+    var ctx = getAudio();
+    if (!ctx) return;
+    var o = ctx.createOscillator();
+    var g = ctx.createGain();
+    o.type = 'sine';
+    o.frequency.value = 1800 + Math.random() * 400;
+    g.gain.setValueAtTime(0.0001, ctx.currentTime);
+    g.gain.exponentialRampToValueAtTime(0.03, ctx.currentTime + 0.005);
+    g.gain.exponentialRampToValueAtTime(0.0001, ctx.currentTime + 0.05);
+    o.connect(g);
+    g.connect(ctx.destination);
+    o.start();
+    o.stop(ctx.currentTime + 0.06);
+}
+
+function playWin(rarity) {
+    var ctx = getAudio();
+    if (!ctx) return;
+    var freqs = {
+        common: [220, 277],
+        uncommon: [261, 329, 392],
+        rare: [329, 415, 523],
+        epic: [415, 523, 659, 784],
+        legend: [523, 659, 784, 1046, 1318]
+    };
+    var notes = freqs[rarity] || freqs.common;
+    var start = ctx.currentTime;
+    for (var i = 0; i < notes.length; i++) {
+        (function (freq, idx) {
+            var o = ctx.createOscillator();
+            var g = ctx.createGain();
+            o.type = 'triangle';
+            o.frequency.value = freq;
+            var t = start + idx * 0.1;
+            g.gain.setValueAtTime(0.0001, t);
+            g.gain.exponentialRampToValueAtTime(0.07, t + 0.02);
+            g.gain.exponentialRampToValueAtTime(0.0001, t + 0.6);
+            o.connect(g);
+            g.connect(ctx.destination);
+            o.start(t);
+            o.stop(t + 0.65);
+        })(notes[i], i);
+    }
+}
+
+function playEvilLaugh() {
+    var ctx = getAudio();
+    if (!ctx) return;
+    var start = ctx.currentTime;
+    for (var i = 0; i < 12; i++) {
+        (function (idx) {
+            var o = ctx.createOscillator();
+            var g = ctx.createGain();
+            o.type = 'sawtooth';
+            var baseFreq = 180 + Math.random() * 60;
+            var t = start + idx * 0.18;
+            o.frequency.setValueAtTime(baseFreq, t);
+            o.frequency.exponentialRampToValueAtTime(baseFreq * 0.7, t + 0.14);
+            g.gain.setValueAtTime(0.0001, t);
+            g.gain.exponentialRampToValueAtTime(0.09, t + 0.02);
+            g.gain.exponentialRampToValueAtTime(0.0001, t + 0.16);
+            o.connect(g);
+            g.connect(ctx.destination);
+            o.start(t);
+            o.stop(t + 0.17);
+        })(i);
+    }
+}
+
+/* ============================================================
+   ЛОГИКА
+   ============================================================ */
+
+function formatMoney(n) {
+    return String(n).replace(/\B(?=(\d{3})+(?!\d))/g, " ");
+}
+
+function updateStats() {
+    document.getElementById('statOpened').textContent = state.opened;
+    document.getElementById('statLegend').textContent = state.legendary;
+    document.getElementById('statBalance').textContent = formatMoney(state.balance);
+}
+
+function renderCases() {
+    var grid = document.getElementById('casesGrid');
+    var html = '';
+    for (var i = 0; i < CASES.length; i++) {
+        var c = CASES[i];
+        var badgeHtml = '';
+        if (c.badge === 'hot') badgeHtml = '<div class="case-badge hot">ХАЙП</div>';
+        else if (c.badge === 'new') badgeHtml = '<div class="case-badge new">NEW</div>';
+        else if (c.badge === 'legend') badgeHtml = '<div class="case-badge legend">TOP</div>';
+
+        var priceClass = c.price === 0 ? 'case-price free' : 'case-price';
+        var priceText = c.price === 0 ? 'БЕСПЛАТНО' : formatMoney(c.price) + ' ₽';
+
+        html += '<div class="case-card' + (c.special ? ' special' : '') + '" onclick="openCase(\'' + c.id + '\')">';
+        html += badgeHtml;
+        html += '<div class="case-image">' + c.iconSvg + '</div>';
+        html += '<div class="case-name">' + c.name + '</div>';
+        html += '<div class="case-desc">' + c.desc + '</div>';
+        html += '<div class="case-footer">';
+        html += '<div class="' + priceClass + '">' + priceText + '</div>';
+        html += '<button class="case-open-btn" onclick="event.stopPropagation(); openCase(\'' + c.id + '\')">Открыть</button>';
+        html += '</div>';
+        html += '</div>';
+    }
+    grid.innerHTML = html;
+}
+
+function renderHistory() {
+    var list = document.getElementById('historyList');
+    if (state.history.length === 0) {
+        list.innerHTML = '<div class="history-empty">Вы ещё не открывали кейсы</div>';
+        return;
+    }
+    var html = '';
+    for (var i = 0; i < state.history.length; i++) {
+        var h = state.history[i];
+        html += '<div class="history-item" data-r="' + h.rarity + '">';
+        html += '<div class="history-item-name">' + h.name + '</div>';
+        html += '<div class="history-item-rarity" data-r="' + h.rarity + '">' + RARITY_NAMES[h.rarity] + '</div>';
+        html += '</div>';
+    }
+    list.innerHTML = html;
+}
+
+function showPage(id) {
+    var pages = document.querySelectorAll('.page');
+    for (var i = 0; i < pages.length; i++) pages[i].classList.remove('active');
+    var target = document.getElementById(id);
+    if (target) target.classList.add('active');
+    window.scrollTo({ top: 0, behavior: 'auto' });
+}
+
+function goHome() {
+    playClick();
+    showPage('pageHome');
+}
+
+/* Взвешенный случайный выбор */
+function pickItem(items) {
+    var weights = {
+        common: 60,
+        uncommon: 25,
+        rare: 10,
+        epic: 4,
+        legend: 1
+    };
+    var pool = [];
+    for (var i = 0; i < items.length; i++) {
+        var w = weights[items[i].rarity] || 10;
+        for (var j = 0; j < w; j++) pool.push(items[i]);
+    }
+    return pool[Math.floor(Math.random() * pool.length)];
+}
+
+/* Генерация рулетки */
+function buildRoulette(caseData, winnerIndex) {
+    var track = document.getElementById('rouletteTrack');
+    var items = [];
+    var winner = caseData.items[winnerIndex];
+
+    /* 50 случайных предметов + победитель в позиции 55 */
+    for (var i = 0; i < 50; i++) {
+        var it = caseData.items[Math.floor(Math.random() * caseData.items.length)];
+        items.push(it);
+    }
+    items.push(winner); /* позиция 50 */
+    for (var k = 0; k < 10; k++) {
+        var it2 = caseData.items[Math.floor(Math.random() * caseData.items.length)];
+        items.push(it2);
+    }
+
+    var html = '';
+    for (var m = 0; m < items.length; m++) {
+        html += '<div class="roulette-item" data-r="' + items[m].rarity + '">';
+        html += '<div class="roulette-item-icon">' + items[m].icon + '</div>';
+        html += '<div class="roulette-item-name">' + items[m].name + '</div>';
+        html += '</div>';
+    }
+    track.innerHTML = html;
+
+    /* Сброс позиции */
+    track.style.transition = 'none';
+    track.style.transform = 'translate3d(0, 0, 0)';
+
+    return 50;
+}
+
+function openCase(caseId) {
+    if (state.spinning) return;
+
+    var caseData = null;
+    for (var i = 0; i < CASES.length; i++) {
+        if (CASES[i].id === caseId) { caseData = CASES[i]; break; }
+    }
+    if (!caseData) return;
+
+    if (caseData.price > state.balance) {
+        playClick();
+        alert('Недостаточно средств. Стоимость кейса: ' + formatMoney(caseData.price) + ' ₽');
+        return;
+    }
+
+    playClick();
+    state.balance -= caseData.price;
+    updateStats();
+
+    state.currentCase = caseData;
+
+    document.getElementById('openerTitle').textContent = caseData.name;
+    document.getElementById('openerSubtitle').textContent = caseData.special ? 'Только для смелых' : 'Испытай удачу';
+
+    showPage('pageOpener');
+
+    /* Выбор предмета */
+    var winner = pickItem(caseData.items);
+    var winnerIndex = caseData.items.indexOf(winner);
+
+    /* Построение рулетки */
+    var winnerSlot = buildRoulette(caseData, winnerIndex);
+
+    /* Расчёт смещения */
+    var container = document.querySelector('.roulette-container');
+    var itemWidth = 160 + 12; /* width + gap */
+    var containerWidth = container.offsetWidth;
+    var targetOffset = winnerSlot * itemWidth + itemWidth / 2 - containerWidth / 2;
+
+    /* Небольшое случайное смещение внутри слота */
+    var jitter = (Math.random() - 0.5) * itemWidth * 0.6;
+    targetOffset += jitter;
+
+    /* Запуск анимации */
+    var track = document.getElementById('rouletteTrack');
+    state.spinning = true;
+
+    setTimeout(function () {
+        track.style.transition = 'transform 6s cubic-bezier(0.15, 0.9, 0.15, 1)';
+        track.style.transform = 'translate3d(-' + targetOffset + 'px, 0, 0)';
+
+        /* Тики во время прокрутки */
+        var tickCount = 0;
+        var maxTicks = 60;
+        var startTime = performance.now();
+        function tickLoop() {
+            if (tickCount >= maxTicks) return;
+            var elapsed = performance.now() - startTime;
+            if (elapsed > 6000) return;
+            var delay = 60 + (elapsed / 6000) * 300;
+            playTick();
+            tickCount++;
+            setTimeout(tickLoop, delay);
+        }
+        tickLoop();
+    }, 50);
+
+    /* Завершение */
+    setTimeout(function () {
+        state.spinning = false;
+        showResult(winner, caseData);
+    }, 6100);
+}
+
+function showResult(item, caseData) {
+    playWin(item.rarity);
+
+    var overlay = document.getElementById('resultOverlay');
+    var card = document.getElementById('resultCard');
+    var rarity = document.getElementById('resultRarity');
+    var icon = document.getElementById('resultIcon');
+    var name = document.getElementById('resultName');
+    var desc = document.getElementById('resultDesc');
+    var glow = document.getElementById('resultGlow');
+
+    card.setAttribute('data-r', item.rarity);
+    rarity.setAttribute('data-r', item.rarity);
+    rarity.textContent = RARITY_NAMES[item.rarity];
+    icon.innerHTML = item.icon;
+    name.textContent = item.name;
+    desc.textContent = item.desc;
+
+    var colors = {
+        common: 'rgba(122, 122, 133, 0.4)',
+        uncommon: 'rgba(74, 126, 255, 0.5)',
+        rare: 'rgba(155, 77, 255, 0.6)',
+        epic: 'rgba(255, 77, 148, 0.6)',
+        legend: 'rgba(245, 184, 0, 0.7)'
+    };
+    glow.style.color = colors[item.rarity] || colors.common;
+
+    /* Специальное: если Егор слил бабки и выпал легендарный */
+    var isEgorWin = caseData && caseData.special && item.rarity === 'legend';
+
+    overlay.classList.add('show');
+
+    if (isEgorWin) {
+        setTimeout(function () {
+            playEvilLaugh();
+            var laugh = document.getElementById('laughOverlay');
+            laugh.classList.add('show');
+            setTimeout(function () {
+                laugh.classList.remove('show');
+            }, 2500);
+        }, 800);
+    }
+
+    /* Обновление статистики */
+    state.opened++;
+    if (item.rarity === 'legend') state.legendary++;
+
+    /* История */
+    state.history.unshift({ name: item.name, rarity: item.rarity, case: caseData.name });
+    if (state.history.length > 20) state.history.pop();
+
+    updateStats();
+    renderHistory();
+
+    /* Кнопка "Открыть ещё" */
+    var againBtn = document.getElementById('resultAgain');
+    againBtn.onclick = function () {
+        closeResult();
+        setTimeout(function () {
+            openCase(caseData.id);
+        }, 100);
+    };
+}
+
+function closeResult() {
+    playClick();
+    document.getElementById('resultOverlay').classList.remove('show');
+}
+
+/* Инициализация */
+window.onload = function () {
+    renderCases();
+    renderHistory();
+    updateStats();
+};
+
+/* Закрытие по ESC */
+document.addEventListener('keydown', function (e) {
+    if (e.key === 'Escape') {
+        closeResult();
+    }
+});
+
+/* Клик по оверлею */
+document.getElementById('resultOverlay').addEventListener('click', function (e) {
+    if (e.target === this) closeResult();
+});
+</script>
+</body>
+</html>
